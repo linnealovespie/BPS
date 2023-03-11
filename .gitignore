@@ -1,2 +1,4 @@
 data/*.csv
-__pycache__
+__pycache_
+data/.ipynb_checkpoints/*
+experiments/.ipynb_checkpoints/*
