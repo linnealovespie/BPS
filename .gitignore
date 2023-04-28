@@ -2,3 +2,5 @@ data/*.csv
 __pycache_
 data/.ipynb_checkpoints/*
 experiments/.ipynb_checkpoints/*
+*/.ipynb_checkpoints/*
+utils.egg-info/*
