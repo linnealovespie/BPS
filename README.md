@@ -7,7 +7,7 @@ This repo contains the data analysis and subsequent reports done by the data sci
 ## Repo Structure: 
 - [data](data/): contains raw and intermediate data.
 - [experiments](experiments/): notebooks for initial exploration. 
-- [util](util/): contains extracted preprocessing, plotting, and other commonly-used functions. To have access to all of these utility functions, run `pip install .` in root. 
+- [utils](utils/): contains extracted preprocessing, plotting, and other commonly-used functions. To have access to all of these utility functions, run `pip install .` in root. 
 
 
 
