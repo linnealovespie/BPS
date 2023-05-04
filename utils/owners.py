@@ -135,13 +135,14 @@ def get_all_companies_from_principal_lookup(principal_name):
     return principals
 
 
-def group_companies_by_principals(principal_match_list):
+def group_companies_by_principals(principal_match_list, out_file_path):
     """
         Given a list of businesses with one line for each principal registered for that business, returns 
         a dataframe where companies are grouped by whether they share a principal. 
         
         principal_match_list is an output from previous steps, like the dataframe `all_matches_principals.csv`
     """
+    print(f"Saving to {out_file_path}")
     columns=['SearchTerm', 'BusinessName', 'PotentialRelatedCompany', 'UBINumber', 'BusinessId', 'Address', 
              'Status', 'Agent', 'Principals', 'isMatch', 'notes']
     results = pd.DataFrame([], columns)
@@ -172,5 +173,5 @@ def group_companies_by_principals(principal_match_list):
             # results = results[results['BusinessId'].isin(all_matches['BusinessId'])]
         if(idx % 25 == 0): 
             print(f"Processing row {idx} of principal_match_list, results is {len(results)}")
-            results.to_csv("companies_and_potential_matches.csv")
+            results.to_csv(f"{out_file_path}.csv")
     return results
