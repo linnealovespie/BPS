@@ -1,6 +1,8 @@
 data/*.csv
-__pycache_
+*__pycache__*
 data/.ipynb_checkpoints/*
 experiments/.ipynb_checkpoints/*
 */.ipynb_checkpoints/*
-utils.egg-info/*
+utils.egg-info/PKG-INFO
+utils.egg-info/SOURCES.txt
+build/*
