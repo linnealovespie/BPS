@@ -37,7 +37,7 @@ def get_business_search_payload(business_name, page_count, page_num):
         'PageCount': page_count,
     }
 
-def get_business_details(business_id):
+def get_business_details(business_idL):
     """ Get business details from the Corporation and charities filing database. """
     url = 'https://cfda.sos.wa.gov/api/BusinessSearch/BusinessInformation?businessID={business_id}'.format(business_id=business_id)
     r = requests.get(url)
@@ -45,7 +45,7 @@ def get_business_details(business_id):
 
 
 class LookupCompaniesHelper:
-    def __init__(self, out_path):
+    def __init__(self, out_path: str):
         self.output_path = out_path
 
     def _get_empty_df(self):
@@ -106,12 +106,32 @@ class LookupCompaniesHelper:
             utils to separate search results into exact match, potential match (where no exact match was found), 
             and additional matches (extra matches if there was an exact match and additional matches)
         """
+        def is_exact_match(row):
+            """ Extract exact matches, including some regex magic. """
+            search = row["SearchTerm"]
+            result = row["BusinessName"]
+
+            # examples: LLC, LLP, L L C, L.L.C., L.L.C. L.L.P., L.L.P, LLC.
+            # Limited Partnership, Limited liability company
+            p = re.compile("L[\s.]?L[\s,.]?[PC][.]" ,flags=re.IGNORECASE)
+            result=result.replace(",", "")
+            result= re.sub(p, "LLC", result)
+            result=result.replace("LIMITED LIABILITY COMPANY", "LLC") 
+            result=result.replace("LIMITED PARTNERSHIP", "LLC") 
+
+            search=search.replace(",", "")
+            search=re.sub(p, "LLC", search)
+            search=search.replace("LIMITED PARTNERSHIP", "LLC") 
+            search=search.replace("LIMITED LIABILITY COMPANY", "LLC") 
+
+            return search == result
+        
         exact_matches = self._get_empty_df()
         exact_matches.columns
         potential_matches = self._get_empty_df()
         additional_matches = self._get_empty_df()
         
-        exact_match = results[results['SearchTerm'] == results['BusinessName']]
+        exact_match = results[results.apply(lambda row: is_exact_match(row))]
         if len(exact_match) > 0:
             exact_matches = pd.concat([exact_matches, exact_match], ignore_index=True)
             additional_matches = pd.concat([additional_matches, results[results['SearchTerm'] != results['BusinessName']]], ignore_index=True)
@@ -120,7 +140,7 @@ class LookupCompaniesHelper:
         
         return exact_matches, potential_matches, additional_matches
 
-    def get_company_list_name_matches(self, owner_list):
+    def get_company_list_name_matches(self, owner_list: list):
         """
             Given a list of owners `owner_list`, returns exact, potential, and additional matches. 
             owner_list: a list of owner names that will be searched in the CCFS database for matches.
@@ -141,7 +161,7 @@ class LookupCompaniesHelper:
         return exact_matches, potential_matches, additional_matches
     
 
-    def get_company_matches_and_export(self, owner_list, x):
+    def get_company_matches_and_export(self, owner_list: list, x: int):
         """
             Given a list of owners `owner_list` and batch number `x`, get all matches and save to exact, potential, and additional
             match CSV's in the folder determined by `output_path`
@@ -154,7 +174,7 @@ class LookupCompaniesHelper:
         additional_matches.to_csv(f'{self.output_path}/additional_matches_{x}.csv')
 
 class GroupCompaniesHelper:
-    def __init__(self, out_path, out_name):
+    def __init__(self, out_path: str, out_name: str):
         self.output_path = out_path # The path to the output file to save the output file
         self.output_name = out_name # The full name of the output file, eg. "companies_and_matches.csv"
 
@@ -261,7 +281,7 @@ class GroupCompaniesHelper:
         
         return merged_principals
 
-    def group_companies_by_principals(self, principal_match_list):
+    def group_companies_by_principals(self, principal_match_list: pd.DataFrame):
         """
             Given a list of businesses with one line for each principal registered for that business, returns 
             a dataframe where companies are grouped by whether they share a principal. 
