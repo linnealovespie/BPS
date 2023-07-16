@@ -35,7 +35,7 @@ class ParcelLookupHelper:
         Fetch the HTML of a Property Detail page for a given tax ID number, `tax_parcel_id_number`.
         Returns a BeautifulSoup object 
         """
-        url = parcel_base_url + self._get_tax_id_str(tax_parcel_id_number)
+        url = self.parcel_base_url + self._get_tax_id_str(tax_parcel_id_number)
         r = requests.get(url)
         html_soup = BeautifulSoup(r.text, 'html.parser')
         data_not_found = html_soup.find('span', text='No data found.')
