@@ -86,11 +86,11 @@ class ParcelLookupHelper:
         parcel_df = self._get_parcel_df()
         for id in tax_parcel_id_numbers:
             parcel_soup = self._make_parcel_soup(id)
-        if not parcel_soup:
-            parcel_df.loc[len(parcel_df.index)] = [id, 'NOT FOUND']
-        else:
-            owner_name = self._get_owner_name_from_soup(parcel_soup)
-            parcel_df.loc[len(parcel_df.index)] = [id, owner_name]
+            if not parcel_soup:
+                parcel_df.loc[len(parcel_df.index)] = [id, 'NOT FOUND']
+            else:
+                owner_name = self._get_owner_name_from_soup(parcel_soup)
+                parcel_df.loc[len(parcel_df.index)] = [id, owner_name]
         
         self._write_parcel_owner_csv(parcel_df, file_name)
                      
