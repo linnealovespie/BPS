@@ -6,7 +6,7 @@ import json
 
 class ParcelLookupHelper:
     def __init__(self, output_path: str):
-        self.output_path = output_path
+        self.output_path = output_path # Absolute path to where files will be saved
         self.parcel_base_url = 'https://blue.kingcounty.com/Assessor/eRealProperty/Detail.aspx?ParcelNbr='
     
     def _get_parcel_df(self):
@@ -35,7 +35,7 @@ class ParcelLookupHelper:
         Fetch the HTML of a Property Detail page for a given tax ID number, `tax_parcel_id_number`.
         Returns a BeautifulSoup object 
         """
-        url = parcel_base_url + self._get_tax_id_str(tax_parcel_id_number)
+        url = self.parcel_base_url + self._get_tax_id_str(tax_parcel_id_number)
         r = requests.get(url)
         html_soup = BeautifulSoup(r.text, 'html.parser')
         data_not_found = html_soup.find('span', text='No data found.')
@@ -84,14 +84,19 @@ class ParcelLookupHelper:
         Given a list of `tax_parcel_id_numbers`, look up the owners and save the results to a CSV, `file_name`.
         """
         parcel_df = self._get_parcel_df()
+        idx = 0
         for id in tax_parcel_id_numbers:
             parcel_soup = self._make_parcel_soup(id)
-        if not parcel_soup:
-            parcel_df.loc[len(parcel_df.index)] = [id, 'NOT FOUND']
-        else:
-            owner_name = self._get_owner_name_from_soup(parcel_soup)
-            parcel_df.loc[len(parcel_df.index)] = [id, owner_name]
-        
+            if not parcel_soup:
+                parcel_df.loc[len(parcel_df.index)] = [id, 'NOT FOUND']
+            else:
+                owner_name = self._get_owner_name_from_soup(parcel_soup)
+                parcel_df.loc[len(parcel_df.index)] = [id, owner_name]
+            if(idx % 25 == 0): 
+                print(f"Processing row {idx} of {len(tax_parcel_id_numbers)} parcel owners")
+                self._write_parcel_owner_csv(parcel_df, file_name)
+            idx += 1
+
         self._write_parcel_owner_csv(parcel_df, file_name)
                      
     def _scrape_parcel_owners_and_unit_details(self, tax_parcel_id_numbers: list, file_name: str):

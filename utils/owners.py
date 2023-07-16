@@ -37,7 +37,7 @@ def get_business_search_payload(business_name, page_count, page_num):
         'PageCount': page_count,
     }
 
-def get_business_details(business_idL):
+def get_business_details(business_id):
     """ Get business details from the Corporation and charities filing database. """
     url = 'https://cfda.sos.wa.gov/api/BusinessSearch/BusinessInformation?businessID={business_id}'.format(business_id=business_id)
     r = requests.get(url)
@@ -46,7 +46,7 @@ def get_business_details(business_idL):
 
 class LookupCompaniesHelper:
     def __init__(self, out_path: str):
-        self.output_path = out_path
+        self.output_path = out_path # Absolute path to where the file will be saved
 
     def _get_empty_df(self):
         return pd.DataFrame([], columns = ['SearchTerm', 'BusinessName', 'UBINumber', 'BusinessId', 
@@ -131,7 +131,7 @@ class LookupCompaniesHelper:
         potential_matches = self._get_empty_df()
         additional_matches = self._get_empty_df()
         
-        exact_match = results[results.apply(lambda row: is_exact_match(row))]
+        exact_match = results[results.apply(lambda row: is_exact_match(row), axis=1)]
         if len(exact_match) > 0:
             exact_matches = pd.concat([exact_matches, exact_match], ignore_index=True)
             additional_matches = pd.concat([additional_matches, results[results['SearchTerm'] != results['BusinessName']]], ignore_index=True)
@@ -320,3 +320,11 @@ class GroupCompaniesHelper:
                 print(f"Processing row {idx} of principal_match_list, results is {len(results)}")
                 results.to_csv(f"{self.output_path}{self.output_name}")
         return results
+    
+# owner = 'RAINIER HOSPITALITY LLC'
+# lookup_helper = LookupCompaniesHelper(os.getcwd())
+# lookup_helper.get_company_matches_and_export([owner],1)
+
+group_helper = GroupCompaniesHelper(os.getcwd(), "companies_and_principals.csv")
+exact_matches_1 = pd.read_csv("exact_matches_1.csv")
+exact_matches_1_principals = group_helper.get_companies_principals(exact_matches_1)
