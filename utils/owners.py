@@ -318,13 +318,7 @@ class GroupCompaniesHelper:
                 results = pd.concat([new_row.to_frame().T, results], ignore_index=True).drop_duplicates(subset="UBINumber").dropna()
             if(idx % 25 == 0): 
                 print(f"Processing row {idx} of principal_match_list, results is {len(results)}")
-                results.to_csv(f"{self.output_path}{self.output_name}")
+                results.to_csv(f"{self.output_path}\{self.output_name}")
+                
+        results.to_csv(f"{self.output_path}\{self.output_name}")
         return results
-    
-# owner = 'RAINIER HOSPITALITY LLC'
-# lookup_helper = LookupCompaniesHelper(os.getcwd())
-# lookup_helper.get_company_matches_and_export([owner],1)
-
-group_helper = GroupCompaniesHelper(os.getcwd(), "companies_and_principals.csv")
-exact_matches_1 = pd.read_csv("exact_matches_1.csv")
-exact_matches_1_principals = group_helper.get_companies_principals(exact_matches_1)
