@@ -14,16 +14,21 @@ class BaselineBEPSModel:
         self.building_data_path = building_data_path
         self.fine_years = fine_years
 
-        self._load_emissions_data()
+    def _load_timeline_data():
         self.timeline = pd.read_csv(self.timeline_path)
-        self.building_data = pd.read_csv(self.building_data_path)
 
+    def _load_building_data():
+        self.building_data = pd.read_csv(self.building_data_path)
 
     def _load_emissions_data():
         emissions = pd.read_csv(self.emissions_path)
         emissions.set_index('Year', inplace=True)
         self.energy_emissions = emissions
 
+    def _load_input_data():
+        self._load_timeline_data()
+        self._load_building_data()
+        self._load_emissions_data()
 
     def _find_ghgi_standard(year, building_type, sq_ft_class):
         '''
@@ -105,6 +110,8 @@ class BaselineBEPSModel:
             return 0
     
     def calculate_baseline_model(start_year, end_year):
+        self._load_input_data()
+        
         baseline_building_info = pd.DataFrame(columns=['OSEBuildingID', 'BuildingName', 'Total_sqft', 'sq_ft_classification'])
         scen_calcs = self._fill_in_expected_baselines(start_year, end_year, self.building_data, baseline_building_info)
         
