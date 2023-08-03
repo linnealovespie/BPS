@@ -1,0 +1,9 @@
+Updates Needed For Data
+
+- use addresses to get long/lat from Google Maps API (2015)
+- council district correction for 2015-2018
+- owners and unit information for 2015-2019
+- add units into column headers
+- normalize units based on legislation's units (requires research, not sure which units they're using)
+- add LegislativeBuildingType (2015-2019)
+
