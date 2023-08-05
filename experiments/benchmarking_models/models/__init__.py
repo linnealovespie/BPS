@@ -1,1 +1,1 @@
-__all__ = ['baseline_model']
+__all__ = ['baseline_model', 'alternate_proposal_model']
